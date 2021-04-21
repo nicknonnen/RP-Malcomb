@@ -17,6 +17,10 @@ Replication Materials Available at: [github repository name](github repository l
 Created: `DD Month YYYY`
 Revised: `DD Month YYYY`
 
+## Acknowledgements
+- Joe, Kufre, members of my group (Maja - esp for going over physical data together, Emma, Drew, Alitzel, Jacob)
+- mention specifics, highlight at the front of my report
+
 ## Abstract
 
 The original study is a multi-criteria analysis of vulnerability to Climate Change in Malawi, and is one of the earliest sub-national geographic models of climate change vulnerability for an African country. The study aims to be replicable, and had 40 citations in Google Scholar as of April 8, 2021.
