@@ -82,7 +82,7 @@ set_rdhs_config(
 dhs_downloads = get_datasets(
   c("MWHR61SV", "MWGE62FL", "MWHR4ESV", "MWGE4BFL"),
   all_lower = FALSE,
-  download_option = "rds" #this datablock downloads data from DHS website
+  download_option = "rds" #this code block downloads data from DHS website
 )
 ```
 
@@ -161,7 +161,7 @@ ta_capacity_2010 = dhshh_2010 %>%
   filter(!(is.na(HV246A) & is.na(HV246D) & is.na(HV246E)  & is.na(HV246G) )) %>% 
   # 24028 obs. of 19 variables 
   # using rowwise() to find sum of livestock by household 
-  rowwise %>%
+  rowwise %>% # are rowwise and [[1]] synonymous?
   mutate(hhlivestock = sum(HV246A, HV246D, HV246E, HV246G, na.rm = T)) %>%
   ungroup %>%
   # using percent_rank(), those  
@@ -199,7 +199,7 @@ ta_capacity_2010 = dhshh_2010 %>%
       radio * 0.03,
       urbanruralscore * 0.02,
       # NAs are not removed here to filter out incomplete surveys later on
-      na.rm = F
+      na.rm = F # what is happening here
     ) 
   ) %>%  
   # removing incomplete surveys 
@@ -223,7 +223,7 @@ ta = left_join(
   by = c("ID_2" = "ta_id")
 )
 
-# making capacity score resemble malcomb et al's work 
+# making capacity score resemble malcomb et al's work
 ta = mutate(ta, capacity_2010 = capacity_2010 * 20) # 20% is the weight applied to AC
 # 256 features 
 
@@ -275,22 +275,22 @@ blank[[1]][] = NA
 
 # reprojecting, clipping, and resampling rasters to new extent and cell size
 # use bilinear for drought to average continuous population exposure values
-dr = st_warp(dr, blank, use_gdal = T, method = "bilinear") #resampling the drought and flood data? 
+dr = st_warp(dr, blank, use_gdal = T, method = "bilinear") # resampling the drought and flood data? 
 # use_gdal = T == what is this, can use 'method' bc using gdal
 # use nearest neighbor for flood risk to preserve integer values
 fl = st_warp(fl, blank, method = "near")  
 
 # removing factors from fl
-nmrc = as.numeric(levels(fl[[1]]))[fl[[1]]] #double brackets create tables but leave out the column heads
-fl = blank #creating a blank raster
-fl[[1]][] = nmrc #these brackets access the fl metadata (first brackets) and then creates a table (second brackets)
+nmrc = as.numeric(levels(fl[[1]]))[fl[[1]]] # double brackets create tables but leave out the column heads
+fl = blank # creating a blank raster
+fl[[1]][] = nmrc # these brackets access the fl metadata (first brackets) and then creates a table (second brackets)
 ```
 
 ```{r rasterizing geometries}
 # clipping traditional authorities with livelihood zones in order to remove lake
-st_clip = function(x,y) st_intersection(x, st_union(st_geometry(y))) #building a clip function
+st_clip = function(x,y) st_intersection(x, st_union(st_geometry(y))) # building a clip function
 
-st_agr(ta) = "constant" #sets geometry as constant for sf objects (sf = point in line geometries)
+st_agr(ta) = "constant" # sets geometry as constant for sf objects (sf = point in line geometries)
 
 ta_2010 = st_clip(st_transform(filter(ta, is.na(capacity_2010) == F), 3395),  st_buffer(st_transform(lhz, 3395), .01)) %>% #why did they buffer here?
   st_transform(4326) #apply the clip function to ta_2010
@@ -306,11 +306,11 @@ vulnerability = function(geo) {
   # creating mask layer
   mask = geo 
   mask[mask > 0] = 1
-  mask[mask == 0] = NA
+  mask[mask == 0] = NA # if we don't have this TA capacity we don't want this to show up in the raster map
   
   # masking flood and drought 
-  flood = fl * mask * 4 #this is already in 0s and 1s
-  drought = dr * mask #drought is already in different classes, must reclassify in diff way
+  flood = fl * mask * 4 # this is already in 0s and 1s
+  drought = dr * mask # drought is in different classes, must reclassify in diff way
   
   # reclassifying drought layer
   qt = quantile(drought[[1]], probs = seq(0, 1, 0.2), na.rm = T)
@@ -324,7 +324,7 @@ vulnerability = function(geo) {
         drought[[1]] <= qt[[5]] ~ 4,
         drought[[1]] > qt[[5]] ~ 5
       )
-    ) %>% select(recoded) * 4 #this results in 20 - the weight of the class
+    ) %>% select(recoded) * 4 # this results in 20 - the weight of the class
   
   # final output (adding component rasters)
   final = (40 - geo) * 0.40 + drought * 0.20 + flood * 0.20
