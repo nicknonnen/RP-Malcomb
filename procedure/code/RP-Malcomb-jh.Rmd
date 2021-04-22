@@ -306,7 +306,7 @@ vulnerability = function(geo) {
   # creating mask layer
   mask = geo 
   mask[mask > 0] = 1
-  mask[mask == 0] = NA # if we don't have this TA capacity we don't want this to show up in the raster map
+  mask[mask == 0] = NA # if we don have this TA capacity we don't want this to show up in the raster map
   
   # masking flood and drought 
   flood = fl * mask * 4 # this is already in 0s and 1s
