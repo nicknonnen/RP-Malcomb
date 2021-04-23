@@ -247,6 +247,35 @@ save(
 )
 ```
 
+# add in LHZ code here
+
+```{R process livelihood data in R}
+# read in LHZ Sensitivity data
+# lhz_scores = read.csv(here(private_r, "lhz.csv"))
+lhz_scores = read.csv(here("data", "raw", "private", "lhz.csv"))
+
+#Join livelihood data into LHZ shp file
+
+lhz_sensitivity = lhz_scores %>%
+  left_join(lhz_scores, by = ("LZCODE" = "LZCODE")) %>%
+  
+  mutate(
+    ownCrops = percent_rank(pctownCrops) * 4 + 1, 
+    wageIncome = percent_rank(pctwageIncome) * 4 + 1, 
+    cashCropIncome = percent_rank(desc(pctcashCropIncome)) * 4 + 1, 
+    newDisaster = percent_rank(desc(pctnewDisaster)) * 4 + 1, 
+  ) %>%
+      
+  rowwise %>%
+  mutate(
+    livelihoodSensitivity = sum(
+      ownCrops * 0.06, 
+      wageIncome * 0.06, 
+      cashCropIncome * 0.04, 
+      newDisaster * 0.04)
+  )
+```
+
 ```{r reading rasters into r}
 # UNEP layers
 dr = read_stars(here("data", "raw", "public", "dr1010ipeykx.tif")) %>% 
