@@ -12,10 +12,10 @@ Original study *by* Malcomb, D. W., E. A. Weaver, and A. R. Krakowka. 2014. Vuln
 Replication Authors:
 Nick Nonnenmacher, Joseph Holler, Kufre Udoh, Open Source GIScience students of fall 2019 and Spring 2021
 
-Replication Materials Available at: [github repository name](github repository link)
+Replication Materials Available at: [nicknonnen/RP-Malcomb](https://github.com/nicknonnen/RP-Malcomb)
 
-Created: `DD Month YYYY`
-Revised: `DD Month YYYY`
+Created: `07 April 2021`
+Revised: `26 April 2021`
 
 ## Acknowledgements
 - Joe, Kufre, members of my group (Maja - esp for going over physical data together, Emma, Drew, Alitzel, Jacob)
@@ -24,6 +24,8 @@ Revised: `DD Month YYYY`
 ## Abstract
 
 The original study is a multi-criteria analysis of vulnerability to Climate Change in Malawi, and is one of the earliest sub-national geographic models of climate change vulnerability for an African country. The study aims to be replicable, and had 40 citations in Google Scholar as of April 8, 2021.
+
+This report is a reproduction of Malcomb et al.'s results, and aims to .... 
 
 ## Original Study Information
 
@@ -45,7 +47,7 @@ This part may be compiled collaboratively as a group!
 ### Analytical Specification
 
 The original study was conducted using ArcGIS and STATA, but does not state which versions of these software were used.
-The replication study will use R.
+The replication study will use R 1.4.1106 and QGIS LTR 3.16.4-Hannover.
 
 ## Materials and Procedure
 
