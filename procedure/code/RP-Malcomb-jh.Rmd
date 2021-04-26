@@ -35,8 +35,8 @@ sf_use_s2(T)
 
 ```{r download data}
 
-private_r = here("data","raw","private") #download data from local repository
-public_r = here("data","raw","public")
+private_r = here("data","raw","private") 
+public_r = here("data","raw","public") # download data from local repository
 
 if (!"traditional_authorities" %in% list.files(public_r)){
   # Malawi administrative areas from GADM version 2.8 https://gadm.org/download_country_v2.html
@@ -57,32 +57,6 @@ if (!"major_lakes.csv" %in% list.files(public_r)) {
     here("data","raw","public","major_lakes.csv")
   )
 }
-```
-
-```{R process livelihood data in R and right join to polygons}
-# read in LHZ Sensitivity data
-lhz_scores = read.csv(here(private_r "lhz.csv"))
-
-#Join livelihood data into LHZ shp file
-lhz_sensitivity <- lhz_scores %>% #problem here?
-  right_join(lhz_scores, by = ("LZCODE" = "LZCODE")) %>%
-
-# transform data into quintiles by percent rank, 0-1 scale
-  mutate(
-    ownCrops = percent_rank(pctownCrops) * 4 + 1,
-    IncomeWage= percent_rank(desc(pctIncomeWage)) * 4 + 1,
-    IncomeCashCrops = percent_rank(pctIncomeCashCrops) * 4 + 1,
-    disasterCoping_mutate = percent_rank(disasterCoping) * 4 + 1 
-  ) %>%
-      
-  rowwise %>%
-    mutate(
-      capacity = sum(
-        ownCrops * 0.06, 
-        IncomeWage * 0.06, 
-        IncomeCashCrops * 0.04, 
-        newDisaster * 0.04
-    )) %>% ungroup
 ```
 
 ```{r dhs data access configuration}
@@ -114,7 +88,7 @@ dhs_downloads = get_datasets(
 
 ```{r 2010 adaptive capacity data}
 ta = read_sf(here("data", "raw", "public","traditional_authorities", "MWI_adm2.shp")) %>%
-  st_make_valid() #reads the data here
+  st_make_valid() # reads the data here
 
 lhz = read_sf(here("data", "raw", "public", "livelihood_zones", "MW_LHZ_2009.shp")) %>% st_make_valid()
 
@@ -128,7 +102,40 @@ dhsclusters_2010 = readRDS(dhs_downloads$MWGE62FL) %>%
          lhz_id = FNID,
          urban_rural = URBAN_RURA)
 
+# drop labels
 dhshh_2010 = readRDS(dhs_downloads$MWHR61SV) %>% zap_labels() 
+```
+
+```{r load in LHZ data}
+lhz_data = read_sf(here("data", "raw", "private", "lhz.csv"))
+```
+
+```{r calculate livelihood sensitivity}
+  # using percent_rank(), those  
+  # in cases where desc() is used, having a greater value before ranked makes a household more vulnerable 
+  # for the quintile thing, rescale from 1 to 5 based on % rank
+lhz_scores = lhz_data %>%
+  # remove LHZs 18 and 19, which have no relevant data 
+  filter(!is.na(pctOwnCrops))%>%
+  mutate(
+    score_pctOwnCrops = percent_rank(pctOwnCrops) * 4 + 1,
+    score_pctIncWage = percent_rank(pctIncWage) * 4 + 1,
+    score_pctIncCashCrops = percent_rank(desc(pctIncCashCrops)) * 4 + 1,
+    score_disasterCoping = percent_rank(desc(disasterCoping)) * 4 + 1,
+  ) %>%
+  # calculating capacity score based on table 2 in Malcomb et al-- apply weights 
+  rowwise %>%
+  mutate(
+    livelihood_sensitivity_total = sum(
+      score_pctOwnCrops * 0.06,
+      score_pctIncWage * 0.06,
+      score_pctIncCashCrops * 0.04,
+      score_disasterCoping * 0.04,
+      # NAs are not removed here to filter out incomplete surveys later on
+      na.rm = F
+    ),
+    livelihood_sensitivity_total_20 = livelihood_sensitivity_total*20
+  ) 
 ```
 
 ```{r households to remove (2010)}
@@ -151,6 +158,7 @@ rmv_2010 = dhshh_2010 %>%  filter(
     HV226  == 95 |
     HV226  == 96 |
     HV207  ==  9 
+  # pulling HHID vector from dataframe
 ) %>% pull(HHID)
 ```
 
@@ -251,7 +259,7 @@ ta = left_join(
 )
 
 # making capacity score resemble malcomb et al's work
-ta = mutate(ta, capacity_2010 = capacity_2010 * 20) # 20% is the weight applied to AC
+# ta = mutate(ta, capacity_2010 = capacity_2010 * 20) # 20% is the weight applied to AC, but actually meaningless
 # 256 features 
 
 # preparing breaks for mapping using natural jenks method
@@ -281,6 +289,13 @@ dr = read_stars(here("data", "raw", "public", "dr1010ipeykx.tif")) %>%
 
 fl = read_stars(here("data", "raw", "public",  "fl1010irmt.tif")) %>% 
   st_set_crs(4326) 
+
+# georeferenced Malcomb et al. maps
+fig4_geo = read_stars(here("data", "derived", "private",  "Figure4_web_referenced.tif")) %>%
+  st_set_crs(4326)
+
+fig5_geo = read_stars(here("data", "derived", "private",  "Figure5_web_referenced.tif")) %>%
+  st_set_crs(4326)
 
 ```
 
