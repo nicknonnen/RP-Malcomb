@@ -59,6 +59,32 @@ if (!"major_lakes.csv" %in% list.files(public_r)) {
 }
 ```
 
+```{R process livelihood data in R and right join to polygons}
+# read in LHZ Sensitivity data
+lhz_scores = read.csv(here(private_r "lhz.csv"))
+
+#Join livelihood data into LHZ shp file
+lhz_sensitivity <- lhz_scores %>% #problem here?
+  right_join(lhz_scores, by = ("LZCODE" = "LZCODE")) %>%
+
+# transform data into quintiles by percent rank, 0-1 scale
+  mutate(
+    ownCrops = percent_rank(pctownCrops) * 4 + 1,
+    IncomeWage= percent_rank(desc(pctIncomeWage)) * 4 + 1,
+    IncomeCashCrops = percent_rank(pctIncomeCashCrops) * 4 + 1,
+    disasterCoping_mutate = percent_rank(disasterCoping) * 4 + 1 
+  ) %>%
+      
+  rowwise %>%
+    mutate(
+      capacity = sum(
+        ownCrops * 0.06, 
+        IncomeWage * 0.06, 
+        IncomeCashCrops * 0.04, 
+        newDisaster * 0.04
+    )) %>% ungroup
+```
+
 ```{r dhs data access configuration}
 email = readline(prompt="Enter DHS Login Email: ")
 project = readline(prompt="Enter Project Name: ")
@@ -164,7 +190,7 @@ ta_capacity_2010 = dhshh_2010 %>%
   rowwise %>% # are rowwise and [[1]] synonymous?
   mutate(hhlivestock = sum(HV246A, HV246D, HV246E, HV246G, na.rm = T)) %>%
   ungroup %>%
-  # using percent_rank(), those  
+  
   # in cases where desc() is used, having a greater value before ranked makes a household more vulnerable 
   mutate(
     livestock = percent_rank(hhlivestock) * 4 + 1, #takes care of the quintile business
@@ -182,6 +208,7 @@ ta_capacity_2010 = dhshh_2010 %>%
     radio = percent_rank(HV207) * 4 + 1,
     urbanruralscore = ifelse(urban_rural == "U", 5, 1)
   ) %>%
+  
   # calculating capacity score based on table 2 in malcomb et al 
   rowwise %>%
   mutate(
@@ -247,35 +274,6 @@ save(
 )
 ```
 
-# add in LHZ code here
-
-```{R process livelihood data in R}
-# read in LHZ Sensitivity data
-# lhz_scores = read.csv(here(private_r, "lhz.csv"))
-lhz_scores = read.csv(here("data", "raw", "private", "lhz.csv"))
-
-#Join livelihood data into LHZ shp file
-
-lhz_sensitivity = lhz_scores %>%
-  left_join(lhz_scores, by = ("LZCODE" = "LZCODE")) %>%
-  
-  mutate(
-    ownCrops = percent_rank(pctownCrops) * 4 + 1, 
-    wageIncome = percent_rank(pctwageIncome) * 4 + 1, 
-    cashCropIncome = percent_rank(desc(pctcashCropIncome)) * 4 + 1, 
-    newDisaster = percent_rank(desc(pctnewDisaster)) * 4 + 1, 
-  ) %>%
-      
-  rowwise %>%
-  mutate(
-    livelihoodSensitivity = sum(
-      ownCrops * 0.06, 
-      wageIncome * 0.06, 
-      cashCropIncome * 0.04, 
-      newDisaster * 0.04)
-  )
-```
-
 ```{r reading rasters into r}
 # UNEP layers
 dr = read_stars(here("data", "raw", "public", "dr1010ipeykx.tif")) %>% 
@@ -328,6 +326,11 @@ ta_2010 = st_clip(st_transform(filter(ta, is.na(capacity_2010) == F), 3395),  st
 # making capacity rasters 
 ta_capacity = st_rasterize(ta_2010[, 'capacity_2010'], blank) #rasterize here
 #lhz_capacity = st_rasterize(lhz[,'capacity'], blank) 
+```
+
+```{r rasterizing geometries}
+# making capacity rasters 
+lhz_capacity = st_rasterize(lhz_sensitivity[,'capacity'], blank) 
 ```
 
 ```{r function to calculate vulnerability}
@@ -420,6 +423,11 @@ map_2010 = ggplot() +
 map_2010
 ```
 
+```{r find max and min values of raster}
+max(ta_final[[1]],na.rm = TRUE)
+min(ta_final[[1]],na.rm = TRUE)
+```
+
 ```{r vulnerability map}
 clrs = mutate(
   ea,
@@ -484,4 +492,129 @@ write_stars(ta_final, here("data","derived","public","ta_capacity.tif"))
 write_sf(ta_2010, results, "ta_2010")
 
 write_sf(lhz, results, "lhz")
+```
+
+```{r load in digital replicas of Malcomb et al.'s maps}
+install.packages = c("dplyr","rgdal", "sf")
+library(dplyr)
+library (rgdal)
+library(sf)
+# read in layers to environment
+fig4 <- st_read(dsn = paste0(here::here(), "/data/derived/public/georeferencing.gpkg"), layer="TAresilience_4")
+fig5 <- st_read(dsn = paste0(here::here(), "/data/derived/public/georeferencing.gpkg"), layer="georef_vulnerability_grid")
+```
+
+```{r load in original and reproduced figures (fig4)}
+or_fig4 = # load original figure 4 data
+  read_sf(here("data", "derived", "public", "georeferencing.gpkg"), 
+          layer="TAresilience_4") %>% 
+  # load ta_resilience layer from georeferencing geopackage
+  st_drop_geometry() %>%
+  # remove the geometry data because two geometries cannot be joined
+  select(c(ID_2,resilience)) %>%  
+  # select only the ID_2 and resilience columns
+  na.omit()
+  # remove records with null values
+rp_fig4 = ta_2010 %>% # prepare our reproduction of figure 4 data
+  select(c(ID_2,capacity_2010)) %>%  
+  # select only the ID_2 and resilience columns
+  # note: geometry columns are 'sticky' -- only way to remove is st_drop_geometry()
+  na.omit()  %>%
+  # remove records with null values
+  mutate(rp_res = case_when(
+  capacity_2010 <= ta_brks[2] ~ 1,
+  capacity_2010 <= ta_brks[3] ~ 2,
+  capacity_2010 <= ta_brks[4] ~ 3,
+  capacity_2010 >  ta_brks[4] ~ 4
+))
+# code the capacity scores as integers, as we see them classified on the map. 
+#ta_brks was the result of a Jenks classification, as noted on Malcomb et al's maps
+```
+
+```{r compare fig 4 original and replicate}
+fig4compare = inner_join(rp_fig4,or_fig4,by="ID_2") %>%  
+  #inner join on field ID_2 keeps only matching records
+  filter(rp_res>0 & rp_res<5 & resilience > 0 & resilience < 5)
+  # keep only records with valid resilience scores
+table(fig4compare$resilience,fig4compare$rp_res)
+# crosstabulation with frequencies
+cor.test(fig4compare$resilience,fig4compare$rp_res,method="spearman")
+# Spearman's Rho correlation test
+fig4compare = mutate(fig4compare, difference = rp_res - resilience) 
+# Calculate difference between the maps so that you can create a difference map
+```
+
+```{r compare continuous raster maps}
+orfig5vect = 
+  read_sf(here("data", "derived", "public", "georeferencing.gpkg"), 
+          layer="vulnerability_grid")
+# load original figure 5 data
+orfig5rast = st_rasterize(orfig5vect["X_mean"], template=ta_final)
+# convert mean of blue values into a raster using ta_final as a reference for raster
+# extent, cell size, CRS, etc.
+orfig5rast = orfig5rast %>% 
+  mutate(or = 1-
+           (X_mean - min(orfig5rast[[1]], na.rm= TRUE)) /
+           (max(orfig5rast[[1]], na.rm= TRUE) -
+            min(orfig5rast[[1]], na.rm= TRUE)
+        )
+)  # or is Re-scaled from 0 to 1 with (value - min)/(max - min)
+# it is also inverted, because higher blue values are less red
+ta_final = ta_final %>% 
+  mutate(rp =
+           (capacity_2010 - min(ta_final[[1]], na.rm= TRUE)) /
+           (max(ta_final[[1]], na.rm= TRUE) -
+            min(ta_final[[1]], na.rm= TRUE)
+        )
+)  # rp is Re-scaled from 0 to 1 with (value - min)/(max - min)
+fig5comp = c( select(ta_final,"rp"), select(orfig5rast,"or"))
+# combine the original (or) fig 5 and reproduced (rp) fig 5
+fig5comp = fig5comp %>% mutate( diff = rp - or )
+# calculate difference between the original and reproduction,
+# for purposes of mapping
+fig5comppts = st_as_sf(fig5comp)
+# convert raster to vector points to simplify plotting and correlation testing
+plot(fig5comppts$or, fig5comppts$rp, xlab="Original Study", ylab="Reproduction")
+# create scatterplot of original results and reproduction results
+cor.test(fig5comppts$or, fig5comppts$rp, method="spearman")
+# Spearman's Rho correlation test
+```
+```{r find max and min values of raster}
+max(fig5comp[[1]],na.rm = TRUE)
+min(fig5comp[[1]],na.rm = TRUE)
+```
+
+```{r vulnerability map differences}
+clrs = mutate(
+  ea,
+  colors = case_when(
+    EA == "Missing Data" ~ "#999999",
+    EA == "National Parks and Reserves" ~ "#D9EABB",
+    EA == "Major Lakes of Malawi" ~ "lightblue"
+  
+  )
+)$colors
+vuln_map = ggplot() +
+  geom_sf(data = ea,
+          fill = clrs,
+          color = NA) +
+  geom_stars(data = fig5comp) +
+  scale_fill_gradient(
+    low = "#FFFF75",
+    high = "#CF4611",
+    breaks = c(0,  1),
+    labels = c("Lower Difference", "Higher Difference"),
+    na.value = "transparent",
+    guide = "colourbar",
+    limits = c(0,  1)
+  ) +
+  scale_x_continuous(breaks = c(33,34,35,36)) +
+  labs(title = "Fig. 4 Replication Comparison") +
+  theme_minimal() +
+  theme(
+    legend.title = element_blank(),
+    axis.title.x = element_blank(),
+    axis.title.y = element_blank()
+  )
+vuln_map_diff
 ```
