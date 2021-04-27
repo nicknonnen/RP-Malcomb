@@ -68,6 +68,7 @@ if (!file.exists(rdhs_json)) file.create(rdhs_json)
 
 # the information here was established through DHS project approval. See dhs-metadata.md in the data/metadata folder for details.
 # running this function will prompt you to enter email and project information in the Console and password in a popup
+
 set_rdhs_config(
   email = email,
   project = project,
@@ -424,6 +425,8 @@ ta_final = vulnerability(ta_capacity)
 ta_final_full = vulnerabilityFull(ta_capacity)
 
 ta_2010$vuln = aggregate(ta_final,ta_2010,mean)$capacity_2010
+
+# this function averages the ta_final (correpsonding to vulnerability) and ta_2010 columns 
 ```
 
 ```{r misc. map features}
@@ -557,14 +560,14 @@ library(dplyr)
 library (rgdal)
 library(sf)
 # read in layers to environment
-fig4 <- st_read(dsn = paste0(here::here(), "/data/derived/public/georeferencing.gpkg"), layer="TAresilience_4")
-fig5 <- st_read(dsn = paste0(here::here(), "/data/derived/public/georeferencing.gpkg"), layer="georef_vulnerability_grid")
+fig4 <- st_read(dsn = paste0(here::here(), "/data/derived/public/georeferencing_MWLadmin2.gpkg"), layer="ta_resilience")
+fig5 <- st_read(dsn = paste0(here::here(), "/data/derived/public/georeferencing_vulGrid.gpkg"), layer="vulnerability_grid")
 ```
 
 ```{r load in original and reproduced figures (fig4)}
 or_fig4 = # load original figure 4 data
-  read_sf(here("data", "derived", "public", "georeferencing.gpkg"), 
-          layer="TAresilience_4") %>% 
+  read_sf(here("data", "derived", "public", "georeferencing_MWLadmin2.gpkg"), 
+          layer="ta_resilience") %>% 
   # load ta_resilience layer from georeferencing geopackage
   st_drop_geometry() %>%
   # remove the geometry data because two geometries cannot be joined
@@ -603,7 +606,7 @@ fig4compare = mutate(fig4compare, difference = rp_res - resilience)
 
 ```{r compare continuous raster maps}
 orfig5vect = 
-  read_sf(here("data", "derived", "public", "georeferencing.gpkg"), 
+  read_sf(here("data", "derived", "public", "georeferencing_vulGrid.gpkg"), 
           layer="vulnerability_grid")
 # load original figure 5 data
 orfig5rast = st_rasterize(orfig5vect["X_mean"], template=ta_final)
