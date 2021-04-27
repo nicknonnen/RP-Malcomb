@@ -168,11 +168,7 @@ HOUSEHOLD RESILIENCE & RASTER WORKFLOW [FINAL DELIVERABLE]
 3. Reclassify the drought values (quantile [from 0 - 1 in intervals of 0.2 =5])
 4. AGGREGATE: Create final vulnerability layer using environmental vulnerability score and ta_capacity.
 
-**Results: Fig. 5**
-
-
-
-The final step to this report
+finally, we georeferenced Figures 4 and 5 from Malcomb et al. (2014) in QGIS in order to compare the original study results to those produced by the above R script. This comparison was quantitatively demonstrated through a Spearman's Rho correlation test, presented here in ***Table X.*** 
 
 ## Replication Results
 
