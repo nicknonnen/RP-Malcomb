@@ -312,6 +312,8 @@ b = st_bbox(
 ) %>%
   st_as_sfc()
 
+# dx and dy are the cell size in the x-direction and y-direction, respectively
+# dx and dy are each 1/24 of a degree
 blank = st_as_stars(st_bbox(b), dx = 0.041667, dy = 0.041667)
 blank[[1]][] = NA 
 
@@ -328,6 +330,16 @@ fl = blank # creating a blank raster
 fl[[1]][] = nmrc # these brackets access the fl metadata (first brackets) and then creates a table (second brackets)
 ```
 
+```{r loading my own 2010 adaptive capacity and vectorized overall resilience from the georeferencing/zonal stats tutorial}
+ta_resilience_RP = read_sf(here("data", "derived", "public", "georeferencing_MWLadmin2.gpkg")) %>%
+  # make geometries valid
+  st_make_valid() 
+
+vulnerability_grid_RP = read_sf(here("data", "derived", "public", "georeferencing_vulGrid.gpkg")) %>%
+  # make geometries valid
+  st_make_valid() 
+```
+
 ```{r rasterizing geometries}
 # clipping traditional authorities with livelihood zones in order to remove lake
 st_clip = function(x,y) st_intersection(x, st_union(st_geometry(y))) # building a clip function
@@ -340,15 +352,10 @@ ta_2010 = st_clip(st_transform(filter(ta, is.na(capacity_2010) == F), 3395),  st
 
 # making capacity rasters 
 ta_capacity = st_rasterize(ta_2010[, 'capacity_2010'], blank) #rasterize here
-#lhz_capacity = st_rasterize(lhz[,'capacity'], blank) 
+lhz_capacity = st_rasterize(lhz_scores[,'livelihood_sensitivity_total_20'], blank) 
 ```
 
-```{r rasterizing geometries}
-# making capacity rasters 
-lhz_capacity = st_rasterize(lhz_sensitivity[,'capacity'], blank) 
-```
-
-```{r function to calculate vulnerability}
+```{r function to calculate vulnerability - 80%}
 vulnerability = function(geo) {
   # creating mask layer
   mask = geo 
@@ -378,8 +385,43 @@ vulnerability = function(geo) {
 }
 ```
 
+```{r function to calculate vulnerability -- 100%}
+vulnerabilityFull = function(geo) {
+  # creating mask layer
+  mask = geo 
+  mask[mask > 0] = 1
+  mask[mask == 0] = NA
+  
+  # masking flood and drought 
+  flood = fl * mask * 4
+  drought = dr * mask
+  
+  # masking LHZ data
+  lhz_masked = lhz_capacity * mask
+  
+  # reclassifying drought layer
+  qt = quantile(drought[[1]], probs = seq(0, 1, 0.2), na.rm = T)
+  
+  drought = drought %>%
+    mutate(
+      recoded = case_when(
+        drought[[1]] <= qt[[2]] ~ 1,
+        drought[[1]] <= qt[[3]] ~ 2,
+        drought[[1]] <= qt[[4]] ~ 3,
+        drought[[1]] <= qt[[5]] ~ 4,
+        drought[[1]] > qt[[5]] ~ 5
+      )
+      # 5*4 = 20
+    ) %>% select(recoded) * 4
+  
+  # final output (adding component rasters)
+  final = (40 - geo) * 0.40 + drought * 0.20 + flood * 0.20 + lhz_masked * 0.20
+}
+```
+
 ```{r creating final vulnerability layers}
 ta_final = vulnerability(ta_capacity) 
+ta_final_full = vulnerabilityFull(ta_capacity)
 
 ta_2010$vuln = aggregate(ta_final,ta_2010,mean)$capacity_2010
 ```
