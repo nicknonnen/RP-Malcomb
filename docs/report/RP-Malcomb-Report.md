@@ -14,7 +14,7 @@ Nick Nonnenmacher, Joseph Holler, Kufre Udoh, Open Source GIScience students of 
 
 Replication Materials Available at: [nicknonnen/RP-Malcomb](https://github.com/nicknonnen/RP-Malcomb)
 
-Created: `07 April 2021`
+Created: `14 April 2021`
 Revised: `26 April 2021`
 
 ## Acknowledgements
@@ -25,7 +25,7 @@ Revised: `26 April 2021`
 
 The original study is a multi-criteria analysis of vulnerability to Climate Change in Malawi, and is one of the earliest sub-national geographic models of climate change vulnerability for an African country. The study aims to be replicable, and had 40 citations in Google Scholar as of April 8, 2021.
 
-This report is a reproduction of Malcomb et al.'s results, and aims to .... 
+This report is a reproduction of Malcomb et al.'s results, and aims to ....
 
 ## Original Study Information
 
@@ -36,13 +36,66 @@ The original study was published without data or code, but has detailed narrativ
 
 ### Data Description and Variables
 
-Outline the data used in the study, including:
+###*Access and Assets Data*
+short blurb here about this data, reference to Table 1
 
-- sources of each data layer and
-- the variable(s) used from each data source
-- transformations applied to the variables (e.g. rescaling variables, calculating derived variables, aggregating to different geographic units, etc.)
+**Table 1:** DHS Variables used in Analysis
 
-This part may be compiled collaboratively as a group!
+| Variable Code | Definition |
+| ------------- | ------------- |
+| HHID | "Case Identification" |
+| HV001 | "Cluster number" |
+|HV002 | Household number |
+| HV246A |"Cattle own" |
+|HV246D | "Goats own"|
+|HV246E | "Sheep own" |
+|HV246G | "Pigs own" |
+| HV248 |"Number of sick people 18-59"|
+| HV245 | "Hectares for agricultural land"|
+|HV271 | "Wealth index factor score (5 decimals)"|
+|HV251 | "Number of orphans and vulnerable children"|
+|HV207 | “Has Radio” |
+| HV243A | “Has a Mobile Telephone”|
+|HV219 | Sex of Head of Household”|
+|HV226 | “Type of Cooking Fuel” |
+| HV206 |"Has electricty” |
+|HV204 |“Time to get to Water Source”|
+
+**Variable Transformations**
+
+1. Eliminate households with null and/or missing values
+2. Join TA and LHZ ID data to the DHS clusters
+3. Eliminate NA values for livestock
+4. Sum counts of all different kinds of livestock into a single variable
+5. Apply weights to normalized indicator variables to get scores for each category (assets, access)
+6. find the stats of the capacity of each TA (min, max, mean, sd)
+7. Join ta_capacity to TA based on ta_id
+8. Prepare breaks for mapping
+9. Class intervals based on capacity_2010 field
+10. Take the values and round them to 2 decimal places
+11. Put data in 4 classes based on break values
+
+###*Livelihood Zones Data*
+add a short blurb here describing this Data
+
+**Table 2:** Constructing Livelihood Sensitivity Categories
+
+| Livelihood Sensitivity Category (LSC)  | Percent Contributing  | How LSC was constructed  |
+| ------------- | ------------- | ------------- |
+| Percent of food from own farm  |  6%  | Sources of food: crops + livestock  |
+| Percent of income from wage labor  | 6%  | Sources of cash: labour etc. / total * 100  |
+| Percent of income from cash crops  | 4%  | sources of cash (Crops): (tobacco + sugar + tea + coffee) + / total sources of cash * 100  |
+| Disaster coping strategy  | 4%  | Self-employment & small business and trade: (firewood + sale of wild food + grass + mats + charcoal) / total sources of cash * 100  |
+
+**Variable Transformations**
+
+1. Join with DHS clusters to apply LHZ FNID variables
+2. Clip TA boundaries to Malawi (st_buffer of LHZ to .01 m)
+3. Create ecological areas: LHZ boundaries intersected with TA boundaries to clip out park/conservation boundaries and rename those park areas with the park information from TA data), combined with lake data to remove environmental areas from the analysis
+
+###*Physical Exposure Data: Floods and Droughts*
+add a short blurb here on each dataset
+
 
 ### Analytical Specification
 
@@ -52,6 +105,7 @@ The replication study will use R 1.4.1106 and QGIS LTR 3.16.4-Hannover.
 ## Materials and Procedure
 
 ADAPTIVE CAPACITY WORKFLOW [ASSETS & ACCESS]
+*Process Adaptive Capacity*
 
 - Bring in DHS Data [Households Level] (vector)
 - FIELD CALCULATOR: Normalize each indicator variable into quintiles (0 is lowest, 5 is highest--we understand this doesn’t make sense if there are only 5 categories, but this is what the authors said they did)
@@ -64,6 +118,7 @@ ADAPTIVE CAPACITY WORKFLOW [ASSETS & ACCESS]
 
 
 HOUSEHOLD RESILIENCE & RASTER WORKFLOW [FINAL DELIVERABLE]
+*Process Livelihood Results*
 
 - RASTERIZE: turn household resilience at TA level into raster data at pixel size (30m? 90m?) of FEWSNET and UNEP
 - Bring in FEWSNET data (raster) and UNEP/GRID data (raster)
@@ -71,7 +126,17 @@ HOUSEHOLD RESILIENCE & RASTER WORKFLOW [FINAL DELIVERABLE]
 - RASTER CALCULATOR: Using FEWSNET, UNEP/GRID, and rasterized DHS resilience data; Calculate household resilience using the following formula:
 - Household Resilience = Adaptive Capacity + Livelihood Sensitivity - Physical Exposure
 
+
+*Process Physical Exposure*
+
+
+*Raster Calculations*
+
 **Results: Fig. 5**
+
+
+
+The final step to this report
 
 ## Replication Results
 
