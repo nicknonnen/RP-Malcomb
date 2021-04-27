@@ -15,9 +15,11 @@ Nick Nonnenmacher, Joseph Holler, Kufre Udoh, Open Source GIScience students of 
 Replication Materials Available at: [nicknonnen/RP-Malcomb](https://github.com/nicknonnen/RP-Malcomb)
 
 Created: `14 April 2021`
-Revised: `26 April 2021`
+Revised: `27 April 2021`
 
 ## Acknowledgements
+
+Thank you Kufre Udoh and Professor Joe Holler of Middlebury College for providing the
 - Joe, Kufre, members of my group (Maja - esp for going over physical data together, Emma, Drew, Alitzel, Jacob)
 - mention specifics, highlight at the front of my report
 
@@ -37,7 +39,11 @@ The original study was published without data or code, but has detailed narrativ
 ### Data Description and Variables
 
 ###*Access and Assets Data*
-short blurb here about this data, reference to Table 1
+Demographic and Health Survey data are a product of the United States Agency for International Development (USAID). Variables contained in this dataset are used to represent adaptive capacity (access + assets) in the Malcomb et al.’s (2014) study. These data come from survey questionnaires with large sample sizes.
+The DHS data used in our study were collected in 2010. In Malawi, the provenance of the DHA data dates back as far as 1992, but has not been collected consistently every year. Each point in the household dataset represents a cluster of households with each cluster corresponding to some form of census enumeration units, such as villages in rural areas or city blocks in urban areas [DHS GPS Manual](/data/metadata/DHS_GPS_Manual_English_A4_24May2013_DHSM9.pdf). This means that each household in each cluster has the same GPS data. This data is collected by trained [USAID](https://www.usaid.gov/) staff using GPS receivers.
+Missing data is a common occurrence in this dataset as a result of negligence or incorrect naming. However, according to the [DHS GPS Manual](/data/metadata/DHS_GPS_Manual_English_A4_24May2013_DHSM9.pdf), these issues are easily rectified and typically sites for which data does not exist are recollected. Sometimes, however, missing information is coded in as such or assigned a proxy location.
+The DHS website acknowledges the high potential for inconsistent or incomplete data in such broad and expansive survey sets. Missing survey data (responses) are never estimated or made up; they are instead coded as a special response indicating the absence of data. As well, there are clear policies in place to ensure the data’s accuracy. More information about data validity can be found on the [DHS’s Data Quality and Use site](https://www.dhsprogram.com/data/Data-Quality-and-Use.cfm).
+In this analysis, we use the variables listed in **Table 1** to determine the average adaptive capacity of each TA area. Data transformations are outlined below.
 
 **Table 1:** DHS Variables used in Analysis
 
@@ -168,7 +174,7 @@ HOUSEHOLD RESILIENCE & RASTER WORKFLOW [FINAL DELIVERABLE]
 3. Reclassify the drought values (quantile [from 0 - 1 in intervals of 0.2 =5])
 4. AGGREGATE: Create final vulnerability layer using environmental vulnerability score and ta_capacity.
 
-Finally, we georeferenced Figures 4 and 5 from Malcomb et al. (2014) in QGIS in order to compare the original study results to those produced by the above R script. This comparison was quantitatively demonstrated through a Spearman's Rho correlation test, presented here in ***Table X.*** 
+Finally, we georeferenced Figures 4 and 5 from Malcomb et al. (2014) in QGIS in order to compare the original study results to those produced by the above R script. This comparison was quantitatively demonstrated through a Spearman's Rho correlation test, presented here in ***Table X.***
 
 ## Replication Results
 
@@ -182,6 +188,12 @@ Figures to Include:
 - map of vulnerability in Malawi, analagous to figure 5 of the original study
 - map of difference between your figure 4 and the original figure 4
 - map of difference between your figure 5 and the original figure 5
+
+
+![Fig4resilience](/assets/Fig4rep.png)
+![resilience_comparison](/assets/Fig4comp.png)
+![Fig5vulnerability](/assets/Fig5rep.png)
+![vulnerability_comparison](/assets/Fig5comp.png)
 
 ## Unplanned Deviations from the Protocol
 
