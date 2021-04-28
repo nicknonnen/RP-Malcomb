@@ -26,8 +26,6 @@ I would also like to thank my lab group, including Maja Cannavo, Emma Clinton, D
 
 The original study is a multi-criteria analysis of vulnerability to Climate Change in Malawi, and is one of the earliest sub-national geographic models of climate change vulnerability for an African country. The study aims to be replicable, and had 40 citations in Google Scholar as of April 8, 2021.
 
-This report is a reproduction of Malcomb et al.'s results, and aims to ....
-
 ## Original Study Information
 
 The study region is the country of Malawi. The spatial support of input data includes DHS survey points, Traditional Authority boundaries, and raster grids of flood risk (0.833 degree resolution) and drought exposure (0.416 degree resolution).
@@ -37,12 +35,19 @@ The original study was published without data or code, but has detailed narrativ
 
 ### Data Description and Variables
 
-###*Access and Assets Data*
+This section was produced collaboratively with labmates Maja Cannavo, Emma Clinton, Drew An-Pham, Jacob Freedman, and Alitzel Villaneuva.
+
+### *Access and Assets Data*
+
 Demographic and Health Survey data are a product of the United States Agency for International Development (USAID). Variables contained in this dataset are used to represent adaptive capacity (access + assets) in the Malcomb et al.’s (2014) study. These data come from survey questionnaires with large sample sizes.
+
 The DHS data used in our study were collected in 2010. In Malawi, the provenance of the DHA data dates back as far as 1992, but has not been collected consistently every year. Each point in the household dataset represents a cluster of households with each cluster corresponding to some form of census enumeration units, such as villages in rural areas or city blocks in urban areas [DHS GPS Manual](/data/metadata/DHS_GPS_Manual_English_A4_24May2013_DHSM9.pdf). This means that each household in each cluster has the same GPS data. This data is collected by trained [USAID](https://www.usaid.gov/) staff using GPS receivers.
+
 Missing data is a common occurrence in this dataset as a result of negligence or incorrect naming. However, according to the [DHS GPS Manual](/data/metadata/DHS_GPS_Manual_English_A4_24May2013_DHSM9.pdf), these issues are easily rectified and typically sites for which data does not exist are recollected. Sometimes, however, missing information is coded in as such or assigned a proxy location.
-The DHS website acknowledges the high potential for inconsistent or incomplete data in such broad and expansive survey sets. Missing survey data (responses) are never estimated or made up; they are instead coded as a special response indicating the absence of data. As well, there are clear policies in place to ensure the data’s accuracy. More information about data validity can be found on the [DHS’s Data Quality and Use site](https://www.dhsprogram.com/data/Data-Quality-and-Use.cfm).
-In this analysis, we use the variables listed in **Table 1** to determine the average adaptive capacity of each TA area. Data transformations are outlined below.
+
+The DHS website acknowledges the high potential for inconsistent or incomplete data in such broad and expansive survey sets. Missing survey data (responses) are never estimated or made up; they are instead coded as a special response indicating the absence of data. As well, there are clear policies in place to ensure the data’s accuracy. More information about data validity can be found on the [DHS’s Data Quality and Use site](https://www.dhsprogram.com/data/Data-Quality-and-Use.cfm). In this analysis, we use the variables listed in **Table 1** to determine the average adaptive capacity of each TA area. Data transformations are outlined below.
+
+Metadata source: Burgert, C. R., Zachary, B., Colston, J. The DHS Program—Data. (2010). The DHS Program--USAID. Retrieved April 19, 2021, from [https://dhsprogram.com/Data/)](https://dhsprogram.com/Data/) ([DHS_GPS_Manual_English_A4_24May2013_DHSM9.pdf file in metadata](https://github.com/emmaclinton/RP-Malcomb/blob/main/data/metadata/DHS_GPS_Manual_English_A4_24May2013_DHSM9.pdf))
 
 **Table 1:** DHS Variables used in Analysis
 
@@ -80,8 +85,15 @@ In this analysis, we use the variables listed in **Table 1** to determine the av
 10. Take the values and round them to 2 decimal places
 11. Put data in 4 classes based on break values
 
-###*Livelihood Zones Data*
-add a short blurb here describing this Data
+### *Livelihood Zones Data*
+
+The livelihood zone (LHZ) data is created by aggregating general regions where similar crops are grown and similar ecological patterns exist. This data exists originally at the household level and was aggregated into Livelihood Zones. To construct the aggregation used for “Livelihood Sensitivity” in this analysis, we use these household points from the FEWSNet data that had previously been aggregated into livelihood zones.
+
+The four Livelihood Sensitivity categories are 1) Percent of food from own farm (6%); 2) Percent of income from wage labor (6%); 3) Percent of income from cash crops (4%); and 4) Disaster coping strategy (4%). In the original R script, household data from the DHS survey was used as a proxy for the specific data points in the livelihood sensitivity analysis (transformation: Join with DHS clusters to apply LHZ FNID variables).
+
+The LHZ data variables are outlined in **Table 2**. The four categories used to determine livelihood sensitivity were ranked from 1-5 based on percent rank values and then weighted using values taken from Malcomb et al. (2014).
+
+Metadata source: Malawi Baseline Livelihood Profiles, Version 1* (September 2005). Made by Malawi National Vulnerability Assessment Committee in collaboration with the SADC FANR Vulnerability Assessment Committee ([mw_baseline_rural_en_2005.pdf file in metadata](https://github.com/emmaclinton/RP-Malcomb/blob/main/data/metadata/mw_baseline_rural_en_2005.pdf))
 
 **Table 2:** Constructing Livelihood Sensitivity Categories
 
@@ -98,8 +110,18 @@ add a short blurb here describing this Data
 2. Clip TA boundaries to Malawi (st_buffer of LHZ to .01 m)
 3. Create ecological areas: LHZ boundaries intersected with TA boundaries to clip out park/conservation boundaries and rename those park areas with the park information from TA data), combined with lake data to remove environmental areas from the analysis
 
-###*Physical Exposure Data: Floods and Droughts*
-add a short blurb here on each dataset
+### *Physical Exposure Data: Floods and Droughts*
+**Flood Data:** This dataset stems from work collected by multiple agencies and funneled into the PREVIEW Global Risk Data Platform, “an effort to share spatial information on global risk from natural hazards.” The dataset was designed by UNEP/GRID-Europe for the Global Assessment Report on Risk Reduction (GAR), using global data. A flood estimation value is assigned via an index of 1 (low) to 5 (extreme).
+
+**Drought Data:** This dataset uses the Standardized Precipitation Index to measure annual drought exposure across the globe. The Standardized Precipitation Index draws on data from a “global monthly gridded precipitation dataset” from the University of East Anglia’s Climatic Research Unit, and was modeled in GIS using methodology from Brad Lyon at Columbia University. The dataset draws on 2010 population information from the LandScanTM Global Population Database at the Oak Ridge National Laboratory.  Drought exposure is reported as the expected average annual (2010) population exposed. The data were compiled by UNEP/GRID-Europe for the Global Assessment Report on Risk Reduction (GAR). The data use the WGS 1984 datum, span the years 1980-2001, and are reported in raster format with spatial resolution 1/24 degree x 1/24 degree.
+
+Metadata source: Global Risk Data Platform: Data-Download. (2013). Global Risk Data Platform.
+
+Drought: Physical exposition to droughts events 1980-2001
+[https://preview.grid.unep.ch/index.php?preview=data&events=droughts&evcat=4&lang=eng](https://preview.grid.unep.ch/index.php?preview=data&events=droughts&evcat=4&lang=eng)
+
+Global estimated risk index for flood hazard
+[https://preview.grid.unep.ch/index.php?preview=data&events=floods&evcat=5&lang=eng](https://preview.grid.unep.ch/index.php?preview=data&events=floods&evcat=5&lang=eng. )
 
 
 ### Analytical Specification
@@ -124,16 +146,6 @@ ADAPTIVE CAPACITY WORKFLOW [ASSETS & ACCESS]
 10. Prepare breaks for mapping Class intervals based on capacity_2010 field Take the values and round them to 2 decimal places Put data in 4 classes based on break values
 11. Save the adaptive capacity scores
 
-```
-- Bring in DHS Data [Households Level] (vector)
-- FIELD CALCULATOR: Normalize each indicator variable into quintiles (0 is lowest, 5 is highest--we understand this doesn’t make sense if there are only 5 categories, but this is what the authors said they did)
-- FIELD CALCULATOR / ADD FIELD: Apply weights to normalized indicator variables to get scores for each category (assets, access, livelihood sensitivity, physical exposure)
-- FIELD CALCULATOR / ADD FIELD: Combine assets and access into adaptive capacity
-- AGGREGATE: Aggregate into villages
-- AGGREGATE: Aggregate into TA geometries, calculate average adaptive capacity score (Assets + Access) for each TA
-
-**Results: Figs. 3 & 4 (for us, only most recent data will be used - equivalent to Fig. 4)**
-```
 
 HOUSEHOLD RESILIENCE & RASTER WORKFLOW [FINAL DELIVERABLE]
 *Process Livelihood Results*
@@ -205,7 +217,7 @@ Summarize changes and uncertainties between
 
 This reproduction was structured so as to specifically highlight how our workflow changed as we gained more and more access to the datasources and workflow utilized in the original Malcomb et al. (2014) study. Therefore, our workflow saw many significant deviations from its initial state, with each major deviation being documented in the form of a new GitHub repository release.
 
-The first challenges came as we first attempted to construct a workflow from the Malcomb et al. (2014), with no access to data. For example, our lab group was unsure of the scale of the DHS data to be used (village, household, district), as well as the specific methodologies for creating quintiles through which to score resiliency. 
+The first challenges came as we first attempted to construct a workflow from the Malcomb et al. (2014), with no access to data. For example, our lab group was unsure of the scale of the DHS data to be used (village, household, district), as well as the specific methodologies for creating quintiles through which to score resiliency.
 
 ## Discussion
 
