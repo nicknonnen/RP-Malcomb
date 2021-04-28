@@ -15,13 +15,12 @@ Nick Nonnenmacher, Joseph Holler, Kufre Udoh, Open Source GIScience students of 
 Replication Materials Available at: [nicknonnen/RP-Malcomb](https://github.com/nicknonnen/RP-Malcomb)
 
 Created: `14 April 2021`
-Revised: `27 April 2021`
+Revised: `28 April 2021`
 
 ## Acknowledgements
 
-Thank you Kufre Udoh and Professor Joe Holler of Middlebury College for providing the
-- Joe, Kufre, members of my group (Maja - esp for going over physical data together, Emma, Drew, Alitzel, Jacob)
-- mention specifics, highlight at the front of my report
+Thank you Kufre Udoh and Professor Joe Holler of Middlebury College for providing a robust framework for the R script used in this study, and for organizing data and a collaborative work environment for completing this reproduction.
+I would also like to thank my lab group, including Maja Cannavo, Emma Clinton, Drew An-Pham, Jacob Freedman, and Alitzel Villaneuva, for their assistance in designing our R script workflow, creating final figures and tables, overcoming coding challenges, and collaboratively compiling data transformation, source, and variable descriptions.
 
 ## Abstract
 
