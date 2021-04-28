@@ -190,8 +190,11 @@ Figures to Include:
 
 
 ![Fig4resilience](/assets/Fig4rep.png)
+
 ![resilience_comparison](/assets/Fig4comp.png)
+
 ![Fig5vulnerability](/assets/Fig5rep.png)
+
 ![vulnerability_comparison](/assets/Fig5comp.png)
 
 ## Unplanned Deviations from the Protocol
@@ -215,7 +218,8 @@ Do the research findings suggest a need for any future research?
 
 ## References
 
-Include any referenced studies or materials in the [AAG Style of author-date referencing](https://www.tandf.co.uk//journals/authors/style/reference/tf_USChicagoB.pdf).
+Malcomb, D. W., E. A. Weaver, and A. R. Krakowka. 2014. Vulnerability modeling for sub-Saharan Africa: An operationalized approach in Malawi. Applied Geography 48:17–30. [DOI:10.1016/j.apgeog.2014.01.004](DOI:10.1016/j.apgeog.2014.01.004)
+
 
 ####  Report Template References & License
 
