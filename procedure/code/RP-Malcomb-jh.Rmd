@@ -13,7 +13,6 @@ output: html_document
 ### [https://gis4dev.github.io/](https://gis4dev.github.io/)
 
 ```{r libraries, include = F}
-
 packages = c("downloader","haven","stars","dplyr","sf","rdhs", "classInt", "readr", "ggplot2", "here", "s2")
 setdiff(packages, rownames(installed.packages())) 
 install.packages(setdiff(packages, rownames(installed.packages())), quietly=TRUE)
@@ -80,11 +79,12 @@ set_rdhs_config(
 ```
 
 ```{r downloading dhs data}
-dhs_downloads = get_datasets(
-  c("MWHR61SV", "MWGE62FL", "MWHR4ESV", "MWGE4BFL"),
-  all_lower = FALSE,
-  download_option = "rds" #this code block downloads data from DHS website
-)
+# don't need to run any of this code block after the first runthrough
+#dhs_downloads = get_datasets(
+  #c("MWHR61SV", "MWGE62FL", "MWHR4ESV", "MWGE4BFL"),
+  #all_lower = FALSE,
+  #download_option = "rds" #this code block downloads data from DHS website
+#)
 ```
 
 ```{r 2010 adaptive capacity data}
@@ -93,7 +93,8 @@ ta = read_sf(here("data", "raw", "public","traditional_authorities", "MWI_adm2.s
 
 lhz = read_sf(here("data", "raw", "public", "livelihood_zones", "MW_LHZ_2009.shp")) %>% st_make_valid()
 
-dhsclusters_2010 = readRDS(dhs_downloads$MWGE62FL) %>%
+# dhsclusters_2010 = readRDS(dhs_downloads$MWGE62FL) %>%
+dhsclusters_2010 = readRDS(here("data", "raw", "private", "datasets", "MWGE62FL.rds")) %>%
   as("sf") %>% 
   st_transform(3395) %>% #transform into the proper projection
   # joining id for traditional authorities and livelihood zones to dhs clusters
@@ -104,11 +105,15 @@ dhsclusters_2010 = readRDS(dhs_downloads$MWGE62FL) %>%
          urban_rural = URBAN_RURA)
 
 # drop labels
-dhshh_2010 = readRDS(dhs_downloads$MWHR61SV) %>% zap_labels() 
+# dhshh_2010 = readRDS(dhs_downloads$MWHR61SV) %>% zap_labels()
+dhshh_2010 = readRDS(here("data", "raw", "private", "datasets", "MWHR61SV.rds")) %>% zap_labels() 
 ```
 
-```{r load in LHZ data}
+```{r load in LHZ data and join to shapes}
 lhz_data = read_sf(here("data", "raw", "private", "lhz.csv"))
+
+lhz_sensitivity <- lhz %>%
+  right_join(lhz_data, by = ("LZCODE" = "LZCODE")) %>%
 ```
 
 ```{r calculate livelihood sensitivity}
@@ -426,7 +431,7 @@ ta_final_full = vulnerabilityFull(ta_capacity)
 
 ta_2010$vuln = aggregate(ta_final,ta_2010,mean)$capacity_2010
 
-# this function averages the ta_final (correpsonding to vulnerability) and ta_2010 columns 
+# this function averages the ta_final (corresponding to vulnerability) and ta_2010 columns 
 ```
 
 ```{r misc. map features}
