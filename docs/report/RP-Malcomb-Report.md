@@ -32,7 +32,6 @@ The study region is the country of Malawi. The spatial support of input data inc
 
 The original study was published without data or code, but has detailed narrative description of the methodology. The methods used are feasible for undergraduate students to implement following completion of one introductory GIS course. The study states that its data is available for replication in 23 African countries.
 
-
 ### Data Description and Variables
 
 This section was produced collaboratively with labmates Maja Cannavo, Emma Clinton, Drew An-Pham, Jacob Freedman, and Alitzel Villaneuva.
