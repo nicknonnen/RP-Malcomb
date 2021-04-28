@@ -203,6 +203,10 @@ Summarize changes and uncertainties between
 - your interpretation and plan for the workflow based on reading the paper
 - your final workflow after accessing the data and code and completing the code
 
+This reproduction was structured so as to specifically highlight how our workflow changed as we gained more and more access to the datasources and workflow utilized in the original Malcomb et al. (2014) study. Therefore, our workflow saw many significant deviations from its initial state, with each major deviation being documented in the form of a new GitHub repository release.
+
+The first challenges came as we first attempted to construct a workflow from the Malcomb et al. (2014), with no access to data. For example, our lab group was unsure of the scale of the DHS data to be used (village, household, district), as well as the specific methodologies for creating quintiles through which to score resiliency. 
+
 ## Discussion
 
 Provide a summary and interpretation of the key findings of the replication *vis-a-vis* the original study results. If the attempt was a failure, discuss possible causes of the failure. In this replication, any failure is probably due to practical causes, which may include:
