@@ -130,7 +130,8 @@ The replication study will use R 1.4.1106 and QGIS LTR 3.16.4-Hannover.
 
 ## Materials and Procedure
 
-ADAPTIVE CAPACITY WORKFLOW [ASSETS & ACCESS]
+The steps below may be found applied in an [R Script here](/malcomb/RP-Malcomb-nn.Rmd)
+
 *Process Adaptive Capacity*
 
 1. Bring in DHS Data [Households Level] (vector)
@@ -145,8 +146,6 @@ ADAPTIVE CAPACITY WORKFLOW [ASSETS & ACCESS]
 10. Prepare breaks for mapping Class intervals based on capacity_2010 field Take the values and round them to 2 decimal places Put data in 4 classes based on break values
 11. Save the adaptive capacity scores
 
-
-HOUSEHOLD RESILIENCE & RASTER WORKFLOW [FINAL DELIVERABLE]
 *Process Livelihood Results*
 
 1. Load in LHZ geometries into R
@@ -155,14 +154,6 @@ HOUSEHOLD RESILIENCE & RASTER WORKFLOW [FINAL DELIVERABLE]
 4. Join the data to the LHZ geometries
 5. Put LHZ data into quintiles
 6. Calculate capacity score based on values in Malcomb et al. (2014)
-
-```
-- RASTERIZE: turn household resilience at TA level into raster data at pixel size (30m? 90m?) of FEWSNET and UNEP
-- Bring in FEWSNET data (raster) and UNEP/GRID data (raster)
-- RASTER CALCULATOR: quintile (assign scores 0-5) and weight FEWSNET & UNEP/GRID data
-- RASTER CALCULATOR: Using FEWSNET, UNEP/GRID, and rasterized DHS resilience data; Calculate household resilience using the following formula:
-- Household Resilience = Adaptive Capacity + Livelihood Sensitivity - Physical Exposure
-```
 
 *Process Physical Exposure*
 
@@ -176,7 +167,6 @@ HOUSEHOLD RESILIENCE & RASTER WORKFLOW [FINAL DELIVERABLE]
 8. RASTERIZE the ta_capacity data with pixel data corresponding to capacity_2010 field
 9. RASTERIZE the livelihood sensitivity score with pixel data corresponding to capacity_2010 field
 
-
 *Raster Calculations*
 
 1. Create a mask
@@ -185,6 +175,7 @@ HOUSEHOLD RESILIENCE & RASTER WORKFLOW [FINAL DELIVERABLE]
 4. AGGREGATE: Create final vulnerability layer using environmental vulnerability score and ta_capacity.
 
 Finally, we georeferenced Figures 4 and 5 from Malcomb et al. (2014) in QGIS in order to compare the original study results to those produced by the above R script. This comparison was quantitatively demonstrated through a Spearman's Rho correlation test, presented here in ***Table X.***
+
 
 ## Replication Results
 
@@ -200,13 +191,13 @@ Figures to Include:
 - map of difference between your figure 5 and the original figure 5
 
 
-![Fig4resilience](/assets/Fig4rep.png)
+![Fig4resilience](/malcomb/assets/Fig4rep.png)
 
-![resilience_comparison](/assets/Fig4comp.png)
+![resilience_comparison](/malcomb/assets/Fig4comp.png)
 
-![Fig5vulnerability](/assets/Fig5rep.png)
+![Fig5vulnerability](/malcomb/assets/Fig5rep.png)
 
-![vulnerability_comparison](/assets/Fig5comp.png)
+![vulnerability_comparison](/malcomb/assets/Fig5comp.png)
 
 ## Unplanned Deviations from the Protocol
 
