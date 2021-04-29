@@ -91,7 +91,7 @@ ta = read_sf(here("data", "raw", "public","traditional_authorities", "MWI_adm2.s
 lhz = read_sf(here("data", "raw", "public", "livelihood_zones", "MW_LHZ_2009.shp")) %>% st_make_valid()
 
 # dhsclusters_2010 = readRDS(dhs_downloads$MWGE62FL) %>%
-dhsclusters_2010 = readRDS(here("RP-Malcomb", "data", "raw", "private", "datasets", "MWGE62FL.rds")) %>%
+dhsclusters_2010 = readRDS(here("data", "raw", "private", "datasets", "MWGE62FL.rds")) %>%
   as("sf") %>% 
   st_transform(3395) %>% #transform into the proper projection
   # joining id for traditional authorities and livelihood zones to dhs clusters
@@ -103,7 +103,7 @@ dhsclusters_2010 = readRDS(here("RP-Malcomb", "data", "raw", "private", "dataset
 
 # drop labels
 # dhshh_2010 = readRDS(dhs_downloads$MWHR61SV) %>% zap_labels()
-dhshh_2010 = readRDS(here("RP-Malcomb", "data", "raw", "private", "datasets", "MWHR61SV.rds")) %>% zap_labels() 
+dhshh_2010 = readRDS(here("data", "raw", "private", "datasets", "MWHR61SV.rds")) %>% zap_labels() 
 ```
 
 ```{r load in lhz and right join to shapes}
@@ -326,7 +326,7 @@ ta_capacity = st_rasterize(ta_2010[, 'capacity_2010'], blank)
 lhz_capacity = st_rasterize(lhz_sensitivity[,'capacity'], blank) 
 ```
 
-```{r function to calculate vulnerability}
+```{r function to calculate vulnerability -- 100%}
 # Raster calculator taking geo as input 
 vulnerability = function(geo) {
   # creating mask layer
@@ -391,7 +391,7 @@ ea = lhz %>%
 
 ```{r 2010 adaptive capacity map}
 map_2010 = ggplot() +
-  geom_sf(data = EA,
+  geom_sf(data = ea,
           aes(fill = EA),
           color = NA) +
   geom_sf( data=ta_2010,
@@ -459,14 +459,14 @@ vuln_map
 ```{r saving maps}
 save(map_2010, vuln_map, file = here("results","maps","maps.Rdata"))
 ggsave(
-  here("results","maps","ac_2010_New.png"),
+  here("results","maps","ac_2010_New.2.png"),
   plot = map_2010,
   width = 8.5,
   height = 11,
   units = "in"
 )
 ggsave(
-  here("results","maps","vulnerability_new.png"),
+  here("results","maps","vulnerability_new.2.png"),
   plot = vuln_map,
   width = 8.5,
   height = 11,
@@ -476,7 +476,7 @@ ggsave(
 
 ```{r saving spatial data outputs}
 results = here("data","derived","public","results.gpkg")
-write_stars(ta_final, here("data","derived","public","ta_capacity.tif"))
+write_stars(ta_final, here("data","derived","public","ta_capacity.2.tif"))
 write_sf(ta_2010, results, "ta_2010")
 write_sf(lhz, results, "lhz")
 ```
@@ -487,14 +487,14 @@ library(dplyr)
 library (rgdal)
 library(sf)
 # read in layers to environment
-fig4 <- st_read(dsn = paste0(here::here(), "/data/derived/public/georeferencing.gpkg"), layer="TAresilience_4")
-fig5 <- st_read(dsn = paste0(here::here(), "/data/derived/public/georeferencing.gpkg"), layer="georef_vulnerability_grid")
+fig4 <- st_read(dsn = paste0(here::here(), "/data/derived/public/georeferencing_MWLadmin2.gpkg"), layer="ta_resilience")
+fig5 <- st_read(dsn = paste0(here::here(), "/data/derived/public/georeferencing_vulGrid.gpkg"), layer="vulnerability_grid")
 ```
 
 ```{r load in original and reproduced figures (fig4)}
 or_fig4 = # load original figure 4 data
-  read_sf(here("data", "derived", "public", "georeferencing.gpkg"), 
-          layer="TAresilience_4") %>% 
+  read_sf(here("data", "derived", "public", "georeferencing_MWLadmin2.gpkg"), 
+          layer="ta_resilience") %>% 
   # load ta_resilience layer from georeferencing geopackage
   st_drop_geometry() %>%
   # remove the geometry data because two geometries cannot be joined
@@ -577,7 +577,7 @@ ac_difference_map
 
 ```{r compare continuous raster maps}
 orfig5vect = 
-  read_sf(here("data", "derived", "public", "georeferencing.gpkg"), 
+  read_sf(here("data", "derived", "public", "georeferencing_vulGrid.gpkg"), 
           layer="vulnerability_grid")
 # load original figure 5 data
 orfig5rast = st_rasterize(orfig5vect["X_mean"], template=ta_final)
