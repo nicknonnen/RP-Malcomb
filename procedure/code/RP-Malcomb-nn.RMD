@@ -59,6 +59,7 @@ if (!"major_lakes.csv" %in% list.files(public_r)) {
 ```{r dhs data access configuration}
 email = readline(prompt="Enter DHS Login Email: ")
 project = readline(prompt="Enter Project Name: ")
+# "Reproducing a Vulnerability Model of Malawi"
 rdhs_json = here("data","raw","private","rdhs.json")
 if (!file.exists(rdhs_json)) file.create(rdhs_json)
 # the information here was established through DHS project approval. See dhs-metadata.md in the data/metadata folder for details.
@@ -90,7 +91,7 @@ ta = read_sf(here("data", "raw", "public","traditional_authorities", "MWI_adm2.s
 lhz = read_sf(here("data", "raw", "public", "livelihood_zones", "MW_LHZ_2009.shp")) %>% st_make_valid()
 
 # dhsclusters_2010 = readRDS(dhs_downloads$MWGE62FL) %>%
-dhsclusters_2010 = readRDS(here("data", "raw", "private", "datasets", "MWGE62FL.rds")) %>%
+dhsclusters_2010 = readRDS(here("RP-Malcomb", "data", "raw", "private", "datasets", "MWGE62FL.rds")) %>%
   as("sf") %>% 
   st_transform(3395) %>% #transform into the proper projection
   # joining id for traditional authorities and livelihood zones to dhs clusters
@@ -102,7 +103,7 @@ dhsclusters_2010 = readRDS(here("data", "raw", "private", "datasets", "MWGE62FL.
 
 # drop labels
 # dhshh_2010 = readRDS(dhs_downloads$MWHR61SV) %>% zap_labels()
-dhshh_2010 = readRDS(here("data", "raw", "private", "datasets", "MWHR61SV.rds")) %>% zap_labels() 
+dhshh_2010 = readRDS(here("RP-Malcomb", "data", "raw", "private", "datasets", "MWHR61SV.rds")) %>% zap_labels() 
 ```
 
 ```{r load in lhz and right join to shapes}
