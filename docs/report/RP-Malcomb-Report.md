@@ -132,6 +132,7 @@ The replication study will use R 1.4.1106 and QGIS LTR 3.16.4-Hannover.
 
 The steps below may be found applied in an [R Script here](/malcomb/RP-Malcomb-nn.Rmd)
 
+
 *Process Adaptive Capacity*
 
 1. Bring in DHS Data [Households Level] (vector)
