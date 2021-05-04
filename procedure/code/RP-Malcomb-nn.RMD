@@ -11,7 +11,7 @@ output: html_document
 
 #### [https://doi.org/10.1016/j.apgeog.2014.01.004]([https://doi.org/10.1016/j.apgeog.2014.01.004)
 
-### Authors: Kufre Udoh, Joseph Holler, and Middlebury College Spring 2019 Geography 323 class
+### Authors: Nick Nonnenmacher Kufre Udoh, Joseph Holler, and Middlebury College Spring 2019 Geography 323 class
 
 ### [https://gis4dev.github.io/](https://gis4dev.github.io/)
 
